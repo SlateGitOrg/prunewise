@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "prunewise"
+version = "0.1.0"
+description = "Chooses a Parquet partition and sort layout from a query log by simulating zone-map pruning."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "prunewise contributors" }]
+dependencies = [
+  "duckdb>=1.1",
+  "pyarrow>=17",
+  "polars>=1.0",
+  "sqlglot>=25",
+  "numpy>=1.26",
+  "typer>=0.12",
+  "rich>=13",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6", "pyyaml>=6"]
+
+[project.scripts]
+prunewise = "prunewise.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/prunewise"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["error"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/prunewise/cli.py" = ["B008"]
