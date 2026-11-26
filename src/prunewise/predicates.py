@@ -21,6 +21,7 @@ from .semijoin import DimensionResolver
 R_NOT = "negation (NOT)"
 R_NEQ = "not-equals (!=)"
 R_FUNC = "function on column"
+R_NONLIT = "non-literal comparison value"
 R_LIKE_LEAD = "leading wildcard LIKE"
 R_LIKE_OTHER = "pattern LIKE"
 R_ILIKE = "case-insensitive LIKE"
@@ -197,7 +198,7 @@ def _compare(node, ctx: _Ctx) -> Cond:
         flip = {exp.GT: exp.LT, exp.GTE: exp.LTE, exp.LT: exp.GT, exp.LTE: exp.GTE}
         col, lit, op = rcol, _literal(left), flip.get(type(node), type(node))
     elif ctx.fact_cols_in(node):
-        return _all_unprunable(ctx, node, R_FUNC)
+        return _all_unprunable(ctx, node, R_NONLIT if lcol or rcol else R_FUNC)
     else:
         return Cond()
     if op is exp.NEQ:
@@ -229,7 +230,7 @@ def _between(node, ctx: _Ctx) -> Cond:
                 d, canonical(k, lo_lit), True, canonical(k, hi_lit), True
             ),
         )
-    return _all_unprunable(ctx, node, R_FUNC)
+    return _all_unprunable(ctx, node, R_NONLIT if col else R_FUNC)
 
 
 def _in(node, ctx: _Ctx) -> Cond:
@@ -240,7 +241,7 @@ def _in(node, ctx: _Ctx) -> Cond:
     if col and items and all(_is_literal(i) for i in items):
         lits = [_literal(i) for i in items]
         return _restrict(col, lambda k, d: IntervalSet.points(d, [canonical(k, v) for v in lits]))
-    return _all_unprunable(ctx, node, R_FUNC if not col else R_OTHER)
+    return _all_unprunable(ctx, node, R_FUNC if not col else R_NONLIT)
 
 
 def _like(node, ctx: _Ctx) -> Cond:

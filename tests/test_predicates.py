@@ -161,3 +161,11 @@ def test_referenced_columns_and_errors(env):
         extract_query("SELECT 1 FROM other", env.resolver)
     with pytest.raises(ValueError, match="unknown column"):
         extract_query("SELECT 1 FROM sales WHERE nope = 1", env.resolver)
+
+
+def test_bare_column_against_a_non_literal_is_not_called_a_function(env):
+    reason = {"store_id": "non-literal comparison value"}
+    assert q(env, "store_id > abs(-4)").unprunable == reason
+    assert q(env, "store_id BETWEEN 1 AND abs(-4)").unprunable == reason
+    assert q(env, "store_id IN (1, abs(-4))").unprunable == reason
+    assert q(env, "abs(store_id) > 4").unprunable == {"store_id": "function on column"}

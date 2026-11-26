@@ -52,7 +52,7 @@ prunewise report --ranking out/ranking.json --workload out/workload.json \
 
 ## Example output
 
-Output of the commands above on the seeded demo data (250,000 line items, 60 stores in 5 regions, 2,000 products in 12 categories, 90 days, 25 query templates).
+Output of the commands above on the seeded demo data (250,000 line items, 60 stores in 5 regions, 2,000 products in 12 categories, 90 days, 25 query templates). The transcript shows `generate`, `analyze-workload` and `rank`; the `materialize` and `validate` output is elided (`...`), and the tables are the output of `report`.
 
 ```text
 $ prunewise generate --config demo --out data
@@ -61,6 +61,7 @@ $ prunewise analyze-workload --data data --out out/workload.json
 25 queries, 2 unprunable predicates -> out/workload.json
 $ prunewise rank --data data --workload out/workload.json --config demo --out out/ranking.json
 32 layouts ranked, 8 excluded; best p_store_region-sale_month__s_product_id__rg5000 at 0.498 of baseline cost
+...
 ```
 
 Ranked layouts (cost ratio is weighted cost relative to the date-partitioned baseline):
